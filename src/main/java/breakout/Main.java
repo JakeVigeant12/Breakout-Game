@@ -113,16 +113,15 @@ public class Main extends Application {
 
         // check for collision with paddle
        Shape intersection = Shape.intersect(ball, paddle);
-//        with shapes, can check precisely based on their geometry
         if (intersection.getBoundsInLocal().getWidth() != -1) {
             ballSpeedY = -1 * ballSpeedY;
-            ballSpeedX = 01 * ballSpeedX;
-
+            ballSpeedX = -1 * ballSpeedX;
         }
+        //Check for wall collisions
         if(ball.getCenterX() >= SIZE || ball.getCenterX() <= 0){
             ballSpeedX = -1 * ballSpeedX;
         }
-        if(ball.getCenterY() >= SIZE || ball.getCenterY() <= 0){
+        if(ball.getCenterY() <= 0){
             ballSpeedY = -1 * ballSpeedY;
         }
     }
