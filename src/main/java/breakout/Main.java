@@ -9,11 +9,15 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.scene.layout.GridPane;
@@ -40,7 +44,10 @@ public class Main extends Application {
     //Game-wide constants
     public static final int BLOCK_SIZE = 10;
     public static final int PADDLE_WIDTH = 150;
+    public static final int BRICK_WIDTH = 50;
+    public static final int BRICK_HEIGHT = 20;
     public static final int PADDLE_HEIGHT = 20;
+    public static final int GRID_POS = 100;
     public static final double BALL_RADIUS = 10;
     public static final int PADDLE_SPEED = 10;
     public static int ballSpeedX = 50;
@@ -71,9 +78,6 @@ public class Main extends Application {
 
     // Create the game's "scene": what shapes will be in the game and their starting properties
     public Scene setupGame (int width, int height, Paint background) {
-        // Construct a gridPane of blocks
-        GridPane gridPane = new GridPane();
-        setBricks(gridPane);
         //TODO: Call Method to loop through and add blocks to the game's dimensions
 
         //Add ball to scene
@@ -84,16 +88,19 @@ public class Main extends Application {
         //Initialize Paddle
         paddle = new Rectangle(SIZE-PADDLE_WIDTH/2,SIZE-PADDLE_HEIGHT/2,PADDLE_WIDTH, PADDLE_HEIGHT);
         paddle.setFill(PADDLE_COLOR);
+        Text test = new Text();
+        test.setFont(new Font("ARIAL", 30));
+        test.setStyle("-fx-font-weight: bold;");
+        test.relocate(100, 100);
+        test.setVisible(true);
+        test.setFill(Color.WHITE);
         //Initialize ScoreBoard
-        //TODO figure out why this doesnt add to root properly
         ScoreBoard scoreBoard = new ScoreBoard(INITIAL_LIVES,INITIAL_SCORE, SIZE, SIZE);
         // create one top level collection to organize the things in the scene
         // order added to the group is the order in which they are drawn
-        Group root = new Group(gridPane, ball, paddle);
-        // could also add them dynamically later
-        //root.getChildren().add(myMover);
-        //root.getChildren().add(myGrower);
-        // create a place to see the shapes
+        scoreBoard.setContainer(GRID_POS,PADDLE_HEIGHT, SIZE);
+        Group root = new Group(ball, paddle,test);
+        setBricks(root);
         myScene = new Scene(root, width, height, background);
         // respond to mouse being moved
         myScene.setOnMouseMoved(e -> handleMouseMoved(e.getX()));
@@ -135,8 +142,20 @@ public class Main extends Application {
         paddle.setX(x);
     }
     //Create gameBricks and position them along gridPane
-    private void setBricks(GridPane myGridPane){
+    private void setBricks(Group root){
+        for(int j = 0; j < 5; j++) {
+            HBox row = new HBox();
+            //Separate rows
+            row.setLayoutY((BRICK_HEIGHT+1)*j);
 
+            //Set Spacing between Bricks in a row
+            row.setSpacing(1);
+            for (int i = 0; i < SIZE/BRICK_WIDTH; i++) {
+                Rectangle cBrick = new Rectangle(BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR);
+                row.getChildren().add(cBrick);
+            }
+            root.getChildren().add(row);
+        }
     }
     // Name for a potentially complex comparison to make code more readable
     private boolean isIntersecting (ImageView a, Rectangle b) {
