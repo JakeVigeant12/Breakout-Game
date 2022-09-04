@@ -44,8 +44,8 @@ public class Main extends Application {
     public static final int PADDLE_HEIGHT = 20;
     public static final double BALL_RADIUS = 10;
     public static final int PADDLE_SPEED = 10;
-    public static final int BALL_SPEEDX = 10;
-    public static final int BALL_SPEEDY = 10;
+    public static int ballSpeedX = 10;
+    public static int ballSpeedY = 100;
     //Game-global variables that change
     public static final int INITIAL_LIVES = 3;
     public static int INITIAL_SCORE = 0;
@@ -108,25 +108,22 @@ public class Main extends Application {
     // Note, there are more sophisticated ways to animate shapes, but these simple ways work fine to start
     private void step (double elapsedTime) {
         //move the ball and check if its hit a brick
-        ball.setCenterX(elapsedTime * BALL_SPEEDX +  ball.getCenterX());
-        ball.setCenterY(elapsedTime * BALL_SPEEDY +  ball.getCenterY());
+        ball.setCenterX(elapsedTime * ballSpeedX +  ball.getCenterX());
+        ball.setCenterY(elapsedTime * ballSpeedY +  ball.getCenterY());
 
         // check for collisions and choose response
-       Shape intersection = Shape.intersect(myMover, myGrower);
+       Shape intersection = Shape.intersect(ball, paddle);
 //        with shapes, can check precisely based on their geometry
         if (intersection.getBoundsInLocal().getWidth() != -1) {
-            myMover.setFill(HIGHLIGHT);
-        }
-        else {
-            myMover.setFill(MOVER_COLOR);
-        }
-        // with images can only check bounding box (as it is calculated in container with other objects)
-        if (isIntersecting(myBouncer, myGrower)) {
-            myGrower.setFill(HIGHLIGHT);
-        }
-        else {
-            myGrower.setFill(GROWER_COLOR);
+            ballSpeedY = -1 * ballSpeedY;
+            if(ball.getCenterX() > paddle.getX() + PADDLE_WIDTH/2){
+                ballSpeedX = 200;
+            }
+            if(ball.getCenterX() <= paddle.getX() + PADDLE_WIDTH/2){
+                ballSpeedX = -200;
+            }
 
+        }
     }
     //Move paddle to current mouse location
     private void handleMouseMoved(double x){
