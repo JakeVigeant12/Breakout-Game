@@ -4,6 +4,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -31,6 +32,7 @@ public class Main extends Application {
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
 
     private static Rectangle paddle;
+    private static Circle ball;
     //Game Element Colors
     public static final Paint BALL_COLOR = Color.WHITE;
     public static final Paint BRICK_COLOR = Color.WHITE;
@@ -38,12 +40,12 @@ public class Main extends Application {
     public static final Paint BACKGROUND = Color.BLACK;
     //Game-wide constants
     public static final int BLOCK_SIZE = 10;
-    public static final int PADDLE_WIDTH = 10;
-    public static final int PADDLE_HEIGHT = 10;
+    public static final int PADDLE_WIDTH = 150;
+    public static final int PADDLE_HEIGHT = 20;
     public static final double BALL_RADIUS = 10;
     public static final int PADDLE_SPEED = 10;
-    public static final int BALL_SPEED = 10;
-    public static final int BLOCK_SPEED = 10;
+    public static final int BALL_SPEEDX = 10;
+    public static final int BALL_SPEEDY = 10;
     //Game-global variables that change
     public static final int INITIAL_LIVES = 3;
     public static int INITIAL_SCORE = 0;
@@ -76,26 +78,26 @@ public class Main extends Application {
         //TODO: Call Method to loop through and add blocks to the game's dimensions
 
         //Add ball to scene
-        Circle ball = new Circle(BALL_RADIUS, BALL_COLOR);
+        ball = new Circle(BALL_RADIUS, BALL_COLOR);
         //Initialize ball position
         ball.setCenterX(width/2);
         ball.setCenterY(height/2);
         //Initialize Paddle
-        paddle = new Rectangle(width / 2 - PADDLE_WIDTH / 2, height / 2 - 100, PADDLE_WIDTH, PADDLE_HEIGHT);
+        paddle = new Rectangle(SIZE-PADDLE_WIDTH/2,SIZE-PADDLE_HEIGHT/2,PADDLE_WIDTH, PADDLE_HEIGHT);
         paddle.setFill(PADDLE_COLOR);
         //Initialize ScoreBoard
-        ScoreBoard scoreBoard = new ScoreBoard(INITIAL_LIVES,INITIAL_SCORE);
+        //TODO figure out why this doesnt add to root properly
+        ScoreBoard scoreBoard = new ScoreBoard(INITIAL_LIVES,INITIAL_SCORE, SIZE, SIZE);
         // create one top level collection to organize the things in the scene
         // order added to the group is the order in which they are drawn
-        Group root = new Group(gridPane, ball, paddle, scoreBoard);
+        Group root = new Group(gridPane, ball, paddle);
         // could also add them dynamically later
         //root.getChildren().add(myMover);
         //root.getChildren().add(myGrower);
         // create a place to see the shapes
         myScene = new Scene(root, width, height, background);
-        // respond to input
-        myScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
-        myScene.setOnMouseClicked(e -> handleMouseInput(e.getX(), e.getY()));
+        // respond to mouse being moved
+        myScene.setOnMouseMoved(e -> handleMouseMoved(e.getX()));
         return myScene;
     }
 
@@ -105,13 +107,13 @@ public class Main extends Application {
     // - goals: did the game or level end?
     // Note, there are more sophisticated ways to animate shapes, but these simple ways work fine to start
     private void step (double elapsedTime) {
-        // update "actors" attributes
-        myMover.setRotate(myMover.getRotate() - ROTATION_RATE * elapsedTime);
-        myGrower.setRotate(myGrower.getRotate() + ROTATION_RATE / 2 * elapsedTime);
+        //move the ball and check if its hit a brick
+        ball.setCenterX(elapsedTime * BALL_SPEEDX +  ball.getCenterX());
+        ball.setCenterY(elapsedTime * BALL_SPEEDY +  ball.getCenterY());
 
         // check for collisions and choose response
-        Shape intersection = Shape.intersect(myMover, myGrower);
-        // with shapes, can check precisely based on their geometry
+       Shape intersection = Shape.intersect(myMover, myGrower);
+//        with shapes, can check precisely based on their geometry
         if (intersection.getBoundsInLocal().getWidth() != -1) {
             myMover.setFill(HIGHLIGHT);
         }
@@ -124,40 +126,11 @@ public class Main extends Application {
         }
         else {
             myGrower.setFill(GROWER_COLOR);
-        }
-    }
 
-    // What to do each time a key is pressed
-    private void handleKeyInput (KeyCode code) {
-        // NOTE new Java syntax that some prefer (but watch out for the many special cases!)
-        //   https://blog.jetbrains.com/idea/2019/02/java-12-and-intellij-idea/
-        switch (code) {
-            case RIGHT -> myMover.setX(myMover.getX() + MOVER_SPEED);
-            case LEFT -> myMover.setX(myMover.getX() - MOVER_SPEED);
-            case UP -> myMover.setY(myMover.getY() - MOVER_SPEED);
-            case DOWN -> myMover.setY(myMover.getY() + MOVER_SPEED);
-        }
-        // TYPICAL way to do it, definitely more readable for longer actions
-//        if (code == KeyCode.RIGHT) {
-//            myMover.setX(myMover.getX() + MOVER_SPEED);
-//        }
-//        else if (code == KeyCode.LEFT) {
-//            myMover.setX(myMover.getX() - MOVER_SPEED);
-//        }
-//        else if (code == KeyCode.UP) {
-//            myMover.setY(myMover.getY() - MOVER_SPEED);
-//        }
-//        else if (code == KeyCode.DOWN) {
-//            myMover.setY(myMover.getY() + MOVER_SPEED);
-//        }
     }
-
-    // What to do each time a mouse button is clicked
-    private void handleMouseInput (double x, double y) {
-        if (myGrower.contains(x, y)) {
-            myGrower.setScaleX(myGrower.getScaleX() * GROWER_RATE);
-            myGrower.setScaleY(myGrower.getScaleY() * GROWER_RATE);
-        }
+    //Move paddle to current mouse location
+    private void handleMouseMoved(double x){
+        paddle.setX(x);
     }
     //Create gameBricks and position them along gridPane
     private void setBricks(GridPane myGridPane){
