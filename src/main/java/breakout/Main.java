@@ -18,7 +18,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.scene.layout.GridPane;
 
-
 /**
  * Some game-initialization materials taken from A basic first example JavaFX program (Robert Duvall).
  *
@@ -123,6 +122,12 @@ public class Main extends Application {
         }
         if(ball.getCenterY() <= 0){
             ballSpeedY = -1 * ballSpeedY;
+        }
+        if(ball.getCenterY() >= SIZE){
+            //Need to lose a life
+            //TODO Call Life Lose Method
+            ball.setCenterX(SIZE/2);
+            ball.setCenterY(SIZE/2);
         }
     }
     //Move paddle to current mouse location
