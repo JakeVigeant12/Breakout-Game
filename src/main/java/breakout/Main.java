@@ -121,10 +121,13 @@ public class Main extends Application {
        Shape intersection = Shape.intersect(ball, paddle);
         if (intersection.getBoundsInLocal().getWidth() != -1) {
             ballSpeedY = -1 * ballSpeedY;
+            //Depending on position ball hits paddle, set velocity
             if(ball.getCenterX()>=(paddle.getX()+PADDLE_WIDTH/2)){
+                //right side always redirects right
                 ballSpeedX = Math.abs(ballSpeedX);
             }
             else{
+                //left side of paddle, always redirects to the left
                 ballSpeedX = -1 * Math.abs(ballSpeedX);
             }
         }
