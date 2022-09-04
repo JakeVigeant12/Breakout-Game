@@ -44,8 +44,8 @@ public class Main extends Application {
     public static final int PADDLE_HEIGHT = 20;
     public static final double BALL_RADIUS = 10;
     public static final int PADDLE_SPEED = 10;
-    public static int ballSpeedX = 10;
-    public static int ballSpeedY = 100;
+    public static int ballSpeedX = 50;
+    public static int ballSpeedY = 200;
     //Game-global variables that change
     public static final int INITIAL_LIVES = 3;
     public static int INITIAL_SCORE = 0;
@@ -111,18 +111,19 @@ public class Main extends Application {
         ball.setCenterX(elapsedTime * ballSpeedX +  ball.getCenterX());
         ball.setCenterY(elapsedTime * ballSpeedY +  ball.getCenterY());
 
-        // check for collisions and choose response
+        // check for collision with paddle
        Shape intersection = Shape.intersect(ball, paddle);
 //        with shapes, can check precisely based on their geometry
         if (intersection.getBoundsInLocal().getWidth() != -1) {
             ballSpeedY = -1 * ballSpeedY;
-            if(ball.getCenterX() > paddle.getX() + PADDLE_WIDTH/2){
-                ballSpeedX = 200;
-            }
-            if(ball.getCenterX() <= paddle.getX() + PADDLE_WIDTH/2){
-                ballSpeedX = -200;
-            }
+            ballSpeedX = 01 * ballSpeedX;
 
+        }
+        if(ball.getCenterX() >= SIZE || ball.getCenterX() <= 0){
+            ballSpeedX = -1 * ballSpeedX;
+        }
+        if(ball.getCenterY() >= SIZE || ball.getCenterY() <= 0){
+            ballSpeedY = -1 * ballSpeedY;
         }
     }
     //Move paddle to current mouse location
