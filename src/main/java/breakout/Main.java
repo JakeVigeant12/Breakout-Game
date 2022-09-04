@@ -121,7 +121,12 @@ public class Main extends Application {
        Shape intersection = Shape.intersect(ball, paddle);
         if (intersection.getBoundsInLocal().getWidth() != -1) {
             ballSpeedY = -1 * ballSpeedY;
-            ballSpeedX = -1 * ballSpeedX;
+            if(ball.getCenterX()>=(paddle.getX()+PADDLE_WIDTH/2)){
+                ballSpeedX = Math.abs(ballSpeedX);
+            }
+            else{
+                ballSpeedX = -1 * Math.abs(ballSpeedX);
+            }
         }
         //Check for wall collisions
         if(ball.getCenterX() >= SIZE || ball.getCenterX() <= 0){
