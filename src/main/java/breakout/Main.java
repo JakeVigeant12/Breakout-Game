@@ -37,9 +37,9 @@ public class Main extends Application {
     private static Rectangle paddle;
     private static Circle ball;
     //Game Element Colors
-    public static final Paint BALL_COLOR = Color.WHITE;
-    public static final Paint BRICK_COLOR = Color.WHITE;
-    public static final Paint PADDLE_COLOR = Color.WHITE;
+    public static final Paint BALL_COLOR = Color.YELLOWGREEN;
+    public static final Paint BRICK_COLOR = Color.INDIANRED;
+    public static final Paint PADDLE_COLOR = Color.CADETBLUE;
     public static final Paint BACKGROUND = Color.BLACK;
     //Game-wide constants
     public static final int BLOCK_SIZE = 10;
