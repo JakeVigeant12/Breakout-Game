@@ -98,11 +98,12 @@ public class Main extends Application {
         paddle.setFill(PADDLE_COLOR);
         // create one top level collection to organize the things in the scene
         // order added to the group is the order in which they are drawn
-        root = new Group(ball, paddle);
+        root = new Group(paddle);
         textInitialize(root);
         brickAccess = new ArrayList<>();
         brickArray = new Group();
         setBricks(root);
+        root.getChildren().add(ball);
         myScene = new Scene(root, width, height, background);
         // respond to mouse being moved
         myScene.setOnMouseMoved(e -> handleMouseMoved(e.getX()));
@@ -126,7 +127,6 @@ public class Main extends Application {
         //Check for brick collisions
         for(Rectangle brick : brickAccess){
             ballBrickIntersection(ball,  brick, brickArray);
-            brickArray.getChildren().remove(brick);
         }
 
     }
@@ -185,8 +185,8 @@ public class Main extends Application {
     private void ballBrickIntersection(Circle ball, Rectangle brick, Group bricks){
         Shape intersection = Shape.intersect(ball, brick);
         if (intersection.getBoundsInLocal().getWidth() != -1) {
-            bricks.getChildren().remove(brick);
             brickAccess.remove(brick);
+            brick.setFill(Color.BLACK);
             if(brickAccess.isEmpty()){
                 winGame();
             }
