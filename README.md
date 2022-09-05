@@ -11,26 +11,24 @@ This project implements the game of Breakout.
 
 Start Date: 9/3/2022
 
-Finish Date: 
+Finish Date: 9/4/2022
 
-Hours Spent:
+Hours Spent: 9
 
 ### Resources Used
 
-El Capitan spinning beachball GIF by madebyjw.com
-https://gfycat.com/rapidathleticilladopsis
-
+Dr Duvall's sample animation code
 
 ### Running the Program
 
 Main class:
-
+Main
 Data files needed: 
-
+None
 Key/Mouse inputs:
-
+Cursor controls paddle
 Cheat keys:
-
+None
 
 ### Notes/Assumptions
 

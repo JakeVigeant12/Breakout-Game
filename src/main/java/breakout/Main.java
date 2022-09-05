@@ -42,15 +42,12 @@ public class Main extends Application {
     private static Text livesText;
 
     private static ArrayList<Rectangle> brickAccess;
-
-    private static ScoreBoard scoreBoard;
     //Game Element Colors
     public static final Paint BALL_COLOR = Color.YELLOWGREEN;
     public static final Paint BRICK_COLOR = Color.INDIANRED;
     public static final Paint PADDLE_COLOR = Color.CADETBLUE;
     public static final Paint BACKGROUND = Color.BLACK;
     //Game-wide constants
-    public static final int BLOCK_SIZE = 10;
     public static final int PADDLE_WIDTH = 150;
     public static final int BRICK_WIDTH = 50;
     public static final int BRICK_HEIGHT = 20;
@@ -58,11 +55,13 @@ public class Main extends Application {
     public static final int GRID_POS = 100;
     public static final int BRICK_ROWS = 5;
     public static final double BALL_RADIUS = 10;
-    public static final int PADDLE_SPEED = 10;
-    public static int ballSpeedX = 50;
-    public static int ballSpeedY = 200;
+
+    public static final int BlOCK_SCORE = 100;
+    public static int ballSpeedX = 100;
+    public static int ballSpeedY = 400;
     public static Integer score = 0;
     public static Integer lives = 3;
+    public static int numBricks = 0;
     //Game-global variables that change
     public static final int INITIAL_LIVES = 3;
     public static int INITIAL_SCORE = 0;
@@ -127,6 +126,7 @@ public class Main extends Application {
         //Check for brick collisions
         for(Rectangle brick : brickAccess){
             ballBrickIntersection(ball,  brick, brickArray);
+            brickArray.getChildren().remove(brick);
         }
 
     }
@@ -147,6 +147,7 @@ public class Main extends Application {
                 Rectangle cBrick = new Rectangle(BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR);
                 row.getChildren().add(cBrick);
                 brickAccess.add(cBrick);
+                numBricks++;
             }
             brickArray.getChildren().add(row);
         }
@@ -185,7 +186,12 @@ public class Main extends Application {
         Shape intersection = Shape.intersect(ball, brick);
         if (intersection.getBoundsInLocal().getWidth() != -1) {
             bricks.getChildren().remove(brick);
+            brickAccess.remove(brick);
+            if(brickAccess.isEmpty()){
+                winGame();
+            }
             ballSpeedY = -1 * ballSpeedY;
+            updateScore();
         }
 
     }
@@ -213,6 +219,18 @@ public class Main extends Application {
         }
         lives--;
         livesText.setText("Lives:" + (lives.toString()));
+    }
+    private void updateScore(){
+        score += BlOCK_SCORE;
+        scoreText.setText("Score:" + score);
+        if(score == numBricks * BlOCK_SCORE){
+            winGame();
+        }
+    }
+    private void winGame(){
+        ballSpeedX = 0;
+        ballSpeedY = 0;
+        livesText.setText("You Win!");
     }
     //End game
     private void endGame(){
