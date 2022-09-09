@@ -130,7 +130,7 @@ public class Main extends Application {
       public void handle(KeyEvent event) {
         switch(event.getCode()){
           case LEFT: gamePaddle.moveLeft(SECOND_DELAY); break;
-          case RIGHT: gamePaddle.moveRight(SECOND_DELAY); break;
+          case RIGHT: gamePaddle.moveRight(SECOND_DELAY, SIZE); break;
         }
       }
     });

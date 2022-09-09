@@ -15,13 +15,21 @@ public class Paddle {
     return this.paddle;
   }
 
-  public void moveRight(double time) {
+  public void moveRight(double time, double size) {
     this.position[0] += velocity * time;
+    if(position[0] >= size - paddle.getWidth()){
+      this.position[0] -= velocity * time;
+      return;
+    }
     paddle.setX(position[0]);
   }
 
   public void moveLeft(double time) {
     this.position[0] -= velocity * time;
+    if(position[0] <= 0){
+      this.position[0] += velocity * time;
+      return;
+    }
     paddle.setX(position[0]);
   }
 }
