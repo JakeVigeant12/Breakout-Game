@@ -24,6 +24,11 @@ public class Paddle {
     paddle.setX(position[0]);
   }
 
+  public void reset(double[] initialCoords) {
+    position = initialCoords;
+    paddle.setX(position[0]);
+    paddle.setY(position[1]);
+  }
   public void moveLeft(double time) {
     this.position[0] -= velocity * time;
     if(position[0] <= 0){

@@ -131,6 +131,8 @@ public class Main extends Application {
         switch(event.getCode()){
           case LEFT: gamePaddle.moveLeft(SECOND_DELAY); break;
           case RIGHT: gamePaddle.moveRight(SECOND_DELAY, SIZE); break;
+          case L: addLife(); break;
+          case R: reset(); break;
         }
       }
     });
@@ -169,12 +171,8 @@ public class Main extends Application {
     if (intersection.getBoundsInLocal().getWidth() != -1) {
       gameBall.reverse(1);
       //Depending on position ball hits paddle, set velocity
-      if (ball.getCenterX() >= (paddle.getX() + PADDLE_WIDTH / 2)) {
-        gameBall.paddleCollison(true);
-      } else {
-        //left side of paddle, always redirects to the left
-        gameBall.paddleCollison(false);
-      }
+      //left side of paddle, always redirects to the left
+      gameBall.paddleCollison(ball.getCenterX() >= (paddle.getX() + PADDLE_WIDTH / 2));
     }
   }
 
@@ -230,6 +228,14 @@ public class Main extends Application {
     }
     lives--;
     livesText.setText("Lives:" + (lives.toString()));
+  }
+  private void addLife(){
+    lives++;
+    livesText.setText("Lives:" + (lives.toString()));
+  }
+  private void reset(){
+    gameBall.reset(new double[]{SIZE/2,SIZE/2});
+    gamePaddle.reset(new double[]{SIZE/2-PADDLE_HEIGHT/2, SIZE-PADDLE_HEIGHT});
   }
 
   private void updateScore() {
