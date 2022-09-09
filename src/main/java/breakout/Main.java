@@ -4,12 +4,14 @@ import java.util.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -37,7 +39,8 @@ public class Main extends Application {
   public static final int FRAMES_PER_SECOND = 70;
   public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
 
-  private static Rectangle paddle;
+
+  private static Paddle gamePaddle;
 
   private Ball gameBall;
 
@@ -60,6 +63,7 @@ public class Main extends Application {
   public static final int PADDLE_HEIGHT = 20;
   public static final int GRID_POS = 100;
   public static final int BRICK_ROWS = 5;
+  private static final double PADDLE_VELOCITY = 3000;
 
 
   public static final int BlOCK_SCORE = 100;
@@ -87,7 +91,7 @@ public class Main extends Application {
     Timeline animation = new Timeline();
     animation.setCycleCount(Timeline.INDEFINITE);
     animation.getKeyFrames()
-        .add(new KeyFrame(Duration.seconds(SECOND_DELAY), e -> step(SECOND_DELAY, root)));
+        .add(new KeyFrame(Duration.seconds(SECOND_DELAY), e -> step(SECOND_DELAY, root,myScene)));
     animation.play();
   }
 
@@ -96,12 +100,11 @@ public class Main extends Application {
     //Add ball to scene
     gameBall = new Ball(BALL_RADIUS, BALL_COLOR, new double[]{width / 2, height / 2});
     //Initialize Paddle
-    paddle = new Rectangle(SIZE - PADDLE_WIDTH / 2, SIZE - PADDLE_HEIGHT / 2, PADDLE_WIDTH,
-        PADDLE_HEIGHT);
-    paddle.setFill(PADDLE_COLOR);
+    gamePaddle = new Paddle(new double[]{SIZE/2-PADDLE_HEIGHT/2, SIZE-PADDLE_HEIGHT}, PADDLE_WIDTH,
+        PADDLE_HEIGHT, PADDLE_VELOCITY, PADDLE_COLOR);
     // create one top level collection to organize the things in the scene
     // order added to the group is the order in which they are drawn
-    root = new Group(paddle);
+    root = new Group(gamePaddle.getShape());
     textInitialize(root);
     brickAccess = new ArrayList<>();
     brickArray = new Group();
@@ -109,7 +112,7 @@ public class Main extends Application {
     root.getChildren().add(gameBall.getCircle());
     myScene = new Scene(root, width, height, background);
     // respond to mouse being moved
-    myScene.setOnMouseMoved(e -> handleMouseMoved(e.getX()));
+
     return myScene;
   }
 
@@ -118,11 +121,21 @@ public class Main extends Application {
   // - collisions: did shapes intersect and, if so, what should happen?
   // - goals: did the game or level end?
   // Note, there are more sophisticated ways to animate shapes, but these simple ways work fine to start
-  private void step(double elapsedTime, Group root) {
+  private void step(double elapsedTime, Group root, Scene scene) {
     //move the ball
     gameBall.move(elapsedTime);
+
+    myScene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+      @Override
+      public void handle(KeyEvent event) {
+        switch(event.getCode()){
+          case LEFT: gamePaddle.moveLeft(SECOND_DELAY); break;
+          case RIGHT: gamePaddle.moveRight(SECOND_DELAY); break;
+        }
+      }
+    });
     // check for collision with paddle
-    ballPaddleIntersection(gameBall.getCircle(), paddle);
+    ballPaddleIntersection(gameBall.getCircle(), gamePaddle.getShape());
     //Check for wall collisions
     ballWallIntersection(gameBall.getCircle());
     //Check for brick collisions
@@ -131,12 +144,6 @@ public class Main extends Application {
     }
 
   }
-
-  //Move paddle to current mouse location
-  private void handleMouseMoved(double x) {
-    paddle.setX(x);
-  }
-
   //Create gameBricks and position them along gridPane
   private void setBricks(Group root) {
     for (int j = 0; j < BRICK_ROWS; j++) {
