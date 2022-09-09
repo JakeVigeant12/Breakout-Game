@@ -144,7 +144,7 @@ public class Main extends Application {
     }
 
   }
-  //Create gameBricks and position them along gridPane
+  //Create gameBricks
   private void setBricks(Group root) {
     for (int j = 0; j < BRICK_ROWS; j++) {
       HBox row = new HBox();
@@ -154,9 +154,9 @@ public class Main extends Application {
       //Set Spacing between Bricks in a row
       row.setSpacing(1);
       for (int i = 0; i < SIZE / BRICK_WIDTH; i++) {
-        Rectangle cBrick = new Rectangle(BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR);
-        row.getChildren().add(cBrick);
-        brickAccess.add(cBrick);
+        Brick cBrick = new Brick(BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR);
+        row.getChildren().add(cBrick.getRect());
+        brickAccess.add(cBrick.getRect());
         numBricks++;
       }
       brickArray.getChildren().add(row);
