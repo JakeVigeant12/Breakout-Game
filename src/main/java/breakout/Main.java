@@ -38,7 +38,9 @@ public class Main extends Application {
   public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
 
   private static Rectangle paddle;
-  private static Circle ball;
+
+  private Ball gameBall;
+
   private static Group root;
   private static Group brickArray;
   private static Text scoreText;
@@ -51,17 +53,16 @@ public class Main extends Application {
   public static final Paint PADDLE_COLOR = Color.CADETBLUE;
   public static final Paint BACKGROUND = Color.BLACK;
   //Game-wide constants
+  public static final double BALL_RADIUS = 10;
   public static final int PADDLE_WIDTH = 150;
   public static final int BRICK_WIDTH = 50;
   public static final int BRICK_HEIGHT = 20;
   public static final int PADDLE_HEIGHT = 20;
   public static final int GRID_POS = 100;
   public static final int BRICK_ROWS = 5;
-  public static final double BALL_RADIUS = 10;
+
 
   public static final int BlOCK_SCORE = 100;
-  public static int ballSpeedX = 100;
-  public static int ballSpeedY = 400;
   public static Integer score = 0;
   public static Integer lives = 3;
   public static int numBricks = 0;
@@ -93,10 +94,7 @@ public class Main extends Application {
   // Create the game's "scene": what shapes will be in the game and their starting properties
   public Scene setupGame(int width, int height, Paint background) {
     //Add ball to scene
-    ball = new Circle(BALL_RADIUS, BALL_COLOR);
-    //Initialize ball position
-    ball.setCenterX(width / 2);
-    ball.setCenterY(height / 2);
+    gameBall = new Ball(BALL_RADIUS, BALL_COLOR, new double[]{width / 2, height / 2});
     //Initialize Paddle
     paddle = new Rectangle(SIZE - PADDLE_WIDTH / 2, SIZE - PADDLE_HEIGHT / 2, PADDLE_WIDTH,
         PADDLE_HEIGHT);
@@ -108,7 +106,7 @@ public class Main extends Application {
     brickAccess = new ArrayList<>();
     brickArray = new Group();
     setBricks(root);
-    root.getChildren().add(ball);
+    root.getChildren().add(gameBall.getCircle());
     myScene = new Scene(root, width, height, background);
     // respond to mouse being moved
     myScene.setOnMouseMoved(e -> handleMouseMoved(e.getX()));
@@ -122,16 +120,14 @@ public class Main extends Application {
   // Note, there are more sophisticated ways to animate shapes, but these simple ways work fine to start
   private void step(double elapsedTime, Group root) {
     //move the ball
-    ball.setCenterX(elapsedTime * ballSpeedX + ball.getCenterX());
-    ball.setCenterY(elapsedTime * ballSpeedY + ball.getCenterY());
-
+    gameBall.move(elapsedTime);
     // check for collision with paddle
-    ballPaddleIntersection(ball, paddle);
+    ballPaddleIntersection(gameBall.getCircle(), paddle);
     //Check for wall collisions
-    ballWallIntersection(ball);
+    ballWallIntersection(gameBall.getCircle());
     //Check for brick collisions
     for (Rectangle brick : brickAccess) {
-      ballBrickIntersection(ball, brick, brickArray);
+      ballBrickIntersection(gameBall.getCircle(), brick, brickArray);
     }
 
   }
@@ -164,28 +160,26 @@ public class Main extends Application {
   private void ballPaddleIntersection(Circle ball, Rectangle paddle) {
     Shape intersection = Shape.intersect(ball, paddle);
     if (intersection.getBoundsInLocal().getWidth() != -1) {
-      ballSpeedY = -1 * ballSpeedY;
+      gameBall.reverse(1);
       //Depending on position ball hits paddle, set velocity
       if (ball.getCenterX() >= (paddle.getX() + PADDLE_WIDTH / 2)) {
-        //right side always redirects right
-        ballSpeedX = Math.abs(ballSpeedX);
+        gameBall.paddleCollison(true);
       } else {
         //left side of paddle, always redirects to the left
-        ballSpeedX = -1 * Math.abs(ballSpeedX);
+        gameBall.paddleCollison(false);
       }
     }
   }
 
   private void ballWallIntersection(Circle ball) {
     if (ball.getCenterX() >= SIZE || ball.getCenterX() <= 0) {
-      ballSpeedX = -1 * ballSpeedX;
+      gameBall.reverse(0);
     }
     if (ball.getCenterY() <= 0) {
-      ballSpeedY = -1 * ballSpeedY;
+      gameBall.reverse(1);
     }
     if (ball.getCenterY() >= SIZE) {
-      ball.setCenterX(SIZE / 2);
-      ball.setCenterY(SIZE / 2);
+      gameBall.reset(new double[]{SIZE / 2, SIZE / 2});
       loseLife();
     }
   }
@@ -198,7 +192,7 @@ public class Main extends Application {
       if (brickAccess.isEmpty()) {
         winGame();
       }
-      ballSpeedY = -1 * ballSpeedY;
+      gameBall.reverse(1);
       updateScore();
     }
 
@@ -240,15 +234,13 @@ public class Main extends Application {
   }
 
   private void winGame() {
-    ballSpeedX = 0;
-    ballSpeedY = 0;
+    gameBall.stopBall();
     livesText.setText("You Win!");
   }
 
   //End game
   private void endGame() {
-    ballSpeedX = 0;
-    ballSpeedY = 0;
+    gameBall.stopBall();
     livesText.setText("Game Over");
   }
 
