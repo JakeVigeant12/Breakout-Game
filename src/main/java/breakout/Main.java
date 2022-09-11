@@ -149,7 +149,9 @@ public class Main extends Application {
   //Create gameBricks
   private void setBricks(Group root) throws FileNotFoundException {
     int currLevel = 1;
-    Scanner scanner = new Scanner(new File("src/main/java/breakout/level1.txt"));
+    String basePath = "src/main/resources/Levels/";
+    String path = basePath + "level" + currLevel + ".txt";
+    Scanner scanner = new Scanner(new File(path));
     int lineCount = 0;
     while (scanner.hasNextLine()) {
       String line = scanner.nextLine();
