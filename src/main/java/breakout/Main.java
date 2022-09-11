@@ -1,5 +1,7 @@
 package breakout;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -49,10 +51,9 @@ public class Main extends Application {
   private static Text scoreText;
   private static Text livesText;
 
-  private static ArrayList<Rectangle> brickAccess;
+  private static ArrayList<Brick> brickAccess;
   //Game Element Colors
   public static final Paint BALL_COLOR = Color.YELLOWGREEN;
-  public static final Paint BRICK_COLOR = Color.INDIANRED;
   public static final Paint PADDLE_COLOR = Color.CADETBLUE;
   public static final Paint BACKGROUND = Color.BLACK;
   //Game-wide constants
@@ -69,7 +70,6 @@ public class Main extends Application {
   public static final int BlOCK_SCORE = 100;
   public static Integer score = 0;
   public static Integer lives = 3;
-  public static int numBricks = 0;
   //Game-global variables that change
   public static final int INITIAL_LIVES = 3;
   public static int INITIAL_SCORE = 0;
@@ -81,7 +81,7 @@ public class Main extends Application {
    * Initialize what will be displayed and that it will be updated regularly.
    */
   @Override
-  public void start(Stage stage) {
+  public void start(Stage stage) throws FileNotFoundException {
     // attach scene to the stage and display it
     myScene = setupGame(SIZE, SIZE, BACKGROUND);
     stage.setScene(myScene);
@@ -96,7 +96,7 @@ public class Main extends Application {
   }
 
   // Create the game's "scene": what shapes will be in the game and their starting properties
-  public Scene setupGame(int width, int height, Paint background) {
+  public Scene setupGame(int width, int height, Paint background) throws FileNotFoundException {
     //Add ball to scene
     gameBall = new Ball(BALL_RADIUS, BALL_COLOR, new double[]{width / 2, height / 2});
     //Initialize Paddle
@@ -141,31 +141,32 @@ public class Main extends Application {
     //Check for wall collisions
     ballWallIntersection(gameBall.getCircle());
     //Check for brick collisions
-    for (Rectangle brick : brickAccess) {
+    for (Brick brick : brickAccess) {
       ballBrickIntersection(gameBall.getCircle(), brick, brickArray);
     }
 
   }
   //Create gameBricks
-  private void setBricks(Group root) {
-    for (int j = 0; j < BRICK_ROWS; j++) {
+  private void setBricks(Group root) throws FileNotFoundException {
+    int currLevel = 1;
+    Scanner scanner = new Scanner(new File("src/main/java/breakout/level1.txt"));
+    int lineCount = 0;
+    while (scanner.hasNextLine()) {
+      String line = scanner.nextLine();
+      lineCount++;
+      String [] bricks = line.split( " ");
       HBox row = new HBox();
-      //Separate rows
-      row.setLayoutY((BRICK_HEIGHT + 1) * j);
-
-      //Set Spacing between Bricks in a row
+      row.setLayoutY((BRICK_HEIGHT + 1) * lineCount);
       row.setSpacing(1);
-      for (int i = 0; i < SIZE / BRICK_WIDTH; i++) {
-        Brick cBrick = new Brick(BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR);
+      for(String num : bricks){
+        Brick cBrick = new Brick(BRICK_WIDTH, BRICK_HEIGHT, Integer.parseInt(num));
         row.getChildren().add(cBrick.getRect());
-        brickAccess.add(cBrick.getRect());
-        numBricks++;
+        brickAccess.add(cBrick);
       }
       brickArray.getChildren().add(row);
     }
     root.getChildren().add(brickArray);
   }
-
   private void ballPaddleIntersection(Circle ball, Rectangle paddle) {
     Shape intersection = Shape.intersect(ball, paddle);
     if (intersection.getBoundsInLocal().getWidth() != -1) {
@@ -189,11 +190,13 @@ public class Main extends Application {
     }
   }
 
-  private void ballBrickIntersection(Circle ball, Rectangle brick, Group bricks) {
-    Shape intersection = Shape.intersect(ball, brick);
+  private void ballBrickIntersection(Circle ball, Brick brick, Group bricks) {
+    Shape intersection = Shape.intersect(ball, brick.getRect());
     if (intersection.getBoundsInLocal().getWidth() != -1) {
-      brickAccess.remove(brick);
-      brick.setFill(Color.BLACK);
+      boolean isDead = brick.subLife();
+      if(isDead){
+        brickAccess.remove(brick);
+      }
       if (brickAccess.isEmpty()) {
         winGame();
       }
@@ -241,9 +244,6 @@ public class Main extends Application {
   private void updateScore() {
     score += BlOCK_SCORE;
     scoreText.setText("Score:" + score);
-    if (score == numBricks * BlOCK_SCORE) {
-      winGame();
-    }
   }
 
   private void winGame() {
