@@ -70,8 +70,6 @@ public class Main extends Application {
   public static final int GRID_POS = 100;
   public static final int BRICK_ROWS = 5;
   private static final double PADDLE_VELOCITY = 3000;
-
-
   public static final int BlOCK_SCORE = 100;
   public static Integer score = 0;
   public static Integer lives = 3;
@@ -99,7 +97,7 @@ public class Main extends Application {
     animation.getKeyFrames()
         .add(new KeyFrame(Duration.seconds(SECOND_DELAY), e -> {
           try {
-            step(SECOND_DELAY, root,myScene);
+            step(SECOND_DELAY, root, myScene);
           } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
           }
@@ -113,7 +111,8 @@ public class Main extends Application {
     //Add ball to scene
     gameBall = new Ball(BALL_RADIUS, BALL_COLOR, new double[]{width / 2, height / 2});
     //Initialize Paddle
-    gamePaddle = new Paddle(new double[]{SIZE/2-PADDLE_HEIGHT/2, SIZE-PADDLE_HEIGHT}, PADDLE_WIDTH,
+    gamePaddle = new Paddle(new double[]{SIZE / 2 - PADDLE_HEIGHT / 2, SIZE - PADDLE_HEIGHT},
+        PADDLE_WIDTH,
         PADDLE_HEIGHT, PADDLE_VELOCITY, PADDLE_COLOR);
     // create one top level collection to organize the things in the scene
     // order added to the group is the order in which they are drawn
@@ -135,7 +134,7 @@ public class Main extends Application {
     String scoreLine = scanner.nextLine();
     String[] scores = scoreLine.split(" ");
     highScores = new ArrayList<>();
-    for(String score : scores){
+    for (String score : scores) {
       highScores.add(Integer.parseInt(score));
     }
 
@@ -153,11 +152,19 @@ public class Main extends Application {
     myScene.setOnKeyPressed(new EventHandler<KeyEvent>() {
       @Override
       public void handle(KeyEvent event) {
-        switch(event.getCode()){
-          case LEFT: gamePaddle.moveLeft(SECOND_DELAY); break;
-          case RIGHT: gamePaddle.moveRight(SECOND_DELAY, SIZE); break;
-          case L: addLife(); break;
-          case R: reset(); break;
+        switch (event.getCode()) {
+          case LEFT:
+            gamePaddle.moveLeft(SECOND_DELAY);
+            break;
+          case RIGHT:
+            gamePaddle.moveRight(SECOND_DELAY, SIZE);
+            break;
+          case L:
+            addLife();
+            break;
+          case R:
+            reset();
+            break;
           case DIGIT1:
             currLevel = 1;
             try {
@@ -243,6 +250,7 @@ public class Main extends Application {
     }
 
   }
+
   //Create gameBricks
   private void setBricks(Group root, int displayLevel) throws FileNotFoundException {
     int currLevel = 1;
@@ -253,11 +261,11 @@ public class Main extends Application {
     while (scanner.hasNextLine()) {
       String line = scanner.nextLine();
       lineCount++;
-      String [] bricks = line.split( " ");
+      String[] bricks = line.split(" ");
       HBox row = new HBox();
       row.setLayoutY((BRICK_HEIGHT + 1) * lineCount);
       row.setSpacing(1);
-      for(String num : bricks){
+      for (String num : bricks) {
         Brick cBrick = new Brick(BRICK_WIDTH, BRICK_HEIGHT, Integer.parseInt(num));
         row.getChildren().add(cBrick.getRect());
         brickAccess.add(cBrick);
@@ -266,6 +274,7 @@ public class Main extends Application {
     }
     root.getChildren().add(brickArray);
   }
+
   private void ballPaddleIntersection(Circle ball, Rectangle paddle) {
     Shape intersection = Shape.intersect(ball, paddle);
     if (intersection.getBoundsInLocal().getWidth() != -1) {
@@ -294,7 +303,7 @@ public class Main extends Application {
     Shape intersection = Shape.intersect(ball, brick.getRect());
     if (intersection.getBoundsInLocal().getWidth() != -1) {
       boolean isDead = brick.subLife();
-      if(isDead){
+      if (isDead) {
         brickAccess.remove(brick);
       }
       if (brickAccess.isEmpty()) {
@@ -345,13 +354,15 @@ public class Main extends Application {
     lives--;
     livesText.setText("Lives:" + (lives.toString()));
   }
-  private void addLife(){
+
+  private void addLife() {
     lives++;
     livesText.setText("Lives:" + (lives.toString()));
   }
-  private void reset(){
-    gameBall.reset(new double[]{SIZE/2,SIZE/2});
-    gamePaddle.reset(new double[]{SIZE/2-PADDLE_HEIGHT/2, SIZE-PADDLE_HEIGHT});
+
+  private void reset() {
+    gameBall.reset(new double[]{SIZE / 2, SIZE / 2});
+    gamePaddle.reset(new double[]{SIZE / 2 - PADDLE_HEIGHT / 2, SIZE - PADDLE_HEIGHT});
   }
 
   private void updateScore() {
@@ -360,15 +371,15 @@ public class Main extends Application {
   }
 
   private void clearLevel() throws FileNotFoundException {
-    if(currLevel == 4){
+    if (currLevel == 4) {
       livesText.setText("You Win!");
       gameBall.stopBall();
       return;
     }
-    levelText.setText("Level: "+currLevel);
+    levelText.setText("Level: " + currLevel);
     brickAccess = new ArrayList<>();
-    gameBall.reset(new double[]{SIZE/2,SIZE/2});
-    setBricks(root,currLevel);
+    gameBall.reset(new double[]{SIZE / 2, SIZE / 2});
+    setBricks(root, currLevel);
 
   }
 
@@ -381,7 +392,7 @@ public class Main extends Application {
     try (Writer writer = new BufferedWriter(new OutputStreamWriter(
         new FileOutputStream("src/main/resources/Scores/highScores.txt"), "utf-8"))) {
       String output = "";
-      for(Integer score : highScores){
+      for (Integer score : highScores) {
         output += score;
         output += " ";
       }
