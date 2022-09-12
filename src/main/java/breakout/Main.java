@@ -299,6 +299,7 @@ public class Main extends Application {
           clearLevel();
           break;
       }
+      powerUpActive = false;
     }
   }
 
