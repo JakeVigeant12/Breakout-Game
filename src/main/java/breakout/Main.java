@@ -53,6 +53,7 @@ public class Main extends Application {
   private static Text scoreText;
   private static Text livesText;
   private static Text topScore;
+  private static Text levelText;
 
   private static ArrayList<Integer> highScores;
   private static ArrayList<Brick> brickAccess;
@@ -309,6 +310,7 @@ public class Main extends Application {
   //Initializes score and lives text
   private void textInitialize(Group root) {
     topScore = new Text("Top Score:" + highScores.get(9).toString());
+    levelText = new Text("Level: " + currLevel);
     scoreText = new Text("Score:" + score.toString());
     livesText = new Text("Lives:" + lives.toString());
     scoreText.setFont(new Font("ARIAL", 30));
@@ -326,7 +328,12 @@ public class Main extends Application {
     topScore.setStyle("-fx-font-weight: bold;");
     topScore.relocate(0, GRID_POS + 25);
     topScore.setVisible(true);
-    root.getChildren().addAll(scoreText, livesText, topScore);
+    levelText.setFill(Color.WHITE);
+    levelText.setFont(new Font("ARIAL", 30));
+    levelText.setStyle("-fx-font-weight: bold;");
+    levelText.relocate(0, GRID_POS + 85);
+    levelText.setVisible(true);
+    root.getChildren().addAll(scoreText, livesText, topScore, levelText);
   }
 
   //lose a life
@@ -358,6 +365,7 @@ public class Main extends Application {
       gameBall.stopBall();
       return;
     }
+    levelText.setText("Level: "+currLevel);
     brickAccess = new ArrayList<>();
     gameBall.reset(new double[]{SIZE/2,SIZE/2});
     setBricks(root,currLevel);
