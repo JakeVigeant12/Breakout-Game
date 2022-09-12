@@ -70,6 +70,7 @@ public class Main extends Application {
   public static final int BlOCK_SCORE = 100;
   public static Integer score = 0;
   public static Integer lives = 3;
+  public static int currLevel = 1;
   //Game-global variables that change
   public static final int INITIAL_LIVES = 3;
   public static int INITIAL_SCORE = 0;
@@ -91,7 +92,13 @@ public class Main extends Application {
     Timeline animation = new Timeline();
     animation.setCycleCount(Timeline.INDEFINITE);
     animation.getKeyFrames()
-        .add(new KeyFrame(Duration.seconds(SECOND_DELAY), e -> step(SECOND_DELAY, root,myScene)));
+        .add(new KeyFrame(Duration.seconds(SECOND_DELAY), e -> {
+          try {
+            step(SECOND_DELAY, root,myScene);
+          } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+          }
+        }));
     animation.play();
   }
 
@@ -108,7 +115,7 @@ public class Main extends Application {
     textInitialize(root);
     brickAccess = new ArrayList<>();
     brickArray = new Group();
-    setBricks(root);
+    setBricks(root, currLevel);
     root.getChildren().add(gameBall.getCircle());
     myScene = new Scene(root, width, height, background);
     // respond to mouse being moved
@@ -121,7 +128,7 @@ public class Main extends Application {
   // - collisions: did shapes intersect and, if so, what should happen?
   // - goals: did the game or level end?
   // Note, there are more sophisticated ways to animate shapes, but these simple ways work fine to start
-  private void step(double elapsedTime, Group root, Scene scene) {
+  private void step(double elapsedTime, Group root, Scene scene) throws FileNotFoundException {
     //move the ball
     gameBall.move(elapsedTime);
 
@@ -133,6 +140,7 @@ public class Main extends Application {
           case RIGHT: gamePaddle.moveRight(SECOND_DELAY, SIZE); break;
           case L: addLife(); break;
           case R: reset(); break;
+
         }
       }
     });
@@ -147,10 +155,10 @@ public class Main extends Application {
 
   }
   //Create gameBricks
-  private void setBricks(Group root) throws FileNotFoundException {
+  private void setBricks(Group root, int displayLevel) throws FileNotFoundException {
     int currLevel = 1;
     String basePath = "src/main/resources/Levels/";
-    String path = basePath + "level" + currLevel + ".txt";
+    String path = basePath + "level" + displayLevel + ".txt";
     Scanner scanner = new Scanner(new File(path));
     int lineCount = 0;
     while (scanner.hasNextLine()) {
@@ -192,7 +200,8 @@ public class Main extends Application {
     }
   }
 
-  private void ballBrickIntersection(Circle ball, Brick brick, Group bricks) {
+  private void ballBrickIntersection(Circle ball, Brick brick, Group bricks)
+      throws FileNotFoundException {
     Shape intersection = Shape.intersect(ball, brick.getRect());
     if (intersection.getBoundsInLocal().getWidth() != -1) {
       boolean isDead = brick.subLife();
@@ -200,7 +209,7 @@ public class Main extends Application {
         brickAccess.remove(brick);
       }
       if (brickAccess.isEmpty()) {
-        winGame();
+        clearLevel();
       }
       gameBall.reverse(1);
       updateScore();
@@ -248,9 +257,16 @@ public class Main extends Application {
     scoreText.setText("Score:" + score);
   }
 
-  private void winGame() {
-    gameBall.stopBall();
-    livesText.setText("You Win!");
+  private void clearLevel() throws FileNotFoundException {
+    currLevel++;
+    if(currLevel == 4){
+      livesText.setText("You Win!");
+      gameBall.stopBall();
+      return;
+    }
+    gameBall.reset(new double[]{SIZE/2,SIZE/2});
+    setBricks(root,currLevel);
+
   }
 
   //End game
