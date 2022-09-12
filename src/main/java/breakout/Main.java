@@ -140,7 +140,78 @@ public class Main extends Application {
           case RIGHT: gamePaddle.moveRight(SECOND_DELAY, SIZE); break;
           case L: addLife(); break;
           case R: reset(); break;
-
+          case DIGIT1:
+            currLevel = 1;
+            try {
+              clearLevel();
+            } catch (FileNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+            break;
+          case DIGIT2:
+            currLevel = 2;
+            try {
+              clearLevel();
+            } catch (FileNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+            break;
+          case DIGIT3:
+            currLevel = 3;
+            try {
+              clearLevel();
+            } catch (FileNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+            break;
+          case DIGIT4:
+            currLevel = 3;
+            try {
+              clearLevel();
+            } catch (FileNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+            break;
+          case DIGIT5:
+            currLevel = 3;
+            try {
+              clearLevel();
+            } catch (FileNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+            break;
+          case DIGIT6:
+            currLevel = 3;
+            try {
+              clearLevel();
+            } catch (FileNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+            break;
+          case DIGIT7:
+            currLevel = 3;
+            try {
+              clearLevel();
+            } catch (FileNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+            break;
+          case DIGIT8:
+            currLevel = 3;
+            try {
+              clearLevel();
+            } catch (FileNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+            break;
+          case DIGIT9:
+            currLevel = 3;
+            try {
+              clearLevel();
+            } catch (FileNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+            break;
         }
       }
     });
@@ -209,6 +280,7 @@ public class Main extends Application {
         brickAccess.remove(brick);
       }
       if (brickAccess.isEmpty()) {
+        currLevel++;
         clearLevel();
       }
       gameBall.reverse(1);
@@ -258,12 +330,12 @@ public class Main extends Application {
   }
 
   private void clearLevel() throws FileNotFoundException {
-    currLevel++;
     if(currLevel == 4){
       livesText.setText("You Win!");
       gameBall.stopBall();
       return;
     }
+    brickAccess = new ArrayList<>();
     gameBall.reset(new double[]{SIZE/2,SIZE/2});
     setBricks(root,currLevel);
 

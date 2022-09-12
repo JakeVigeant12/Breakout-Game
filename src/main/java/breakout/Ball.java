@@ -36,7 +36,7 @@ public class Ball {
 
   //Ball reverses direction in only one dimension at a time, so passing 0 or 1 to decide which works
   public void reverse(int direction) {
-    velocity[direction] *= -1.005;
+    velocity[direction] *= -1;
   }
 
   public void stopBall() {
@@ -46,10 +46,10 @@ public class Ball {
 
   public void paddleCollison(boolean right) {
     if (right) {
-      velocity[0] = 1.005 * Math.abs(velocity[0]);
+      velocity[0] = Math.abs(velocity[0]);
       return;
     }
-    velocity[0] = -1.005 * Math.abs(velocity[0]);
+    velocity[0] = -1 * Math.abs(velocity[0]);
   }
 
 }
