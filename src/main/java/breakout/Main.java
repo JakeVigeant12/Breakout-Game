@@ -74,6 +74,8 @@ public class Main extends Application {
   public static Integer score = 0;
   public static Integer lives = 3;
   public static int currLevel = 1;
+  public static boolean powerUpActive= false;
+  public static PowerUp justReleased;
   //Game-global variables that change
   public static final int INITIAL_LIVES = 3;
   public static int INITIAL_SCORE = 0;
@@ -123,8 +125,6 @@ public class Main extends Application {
     setBricks(root, currLevel);
     root.getChildren().add(gameBall.getCircle());
     myScene = new Scene(root, width, height, background);
-    // respond to mouse being moved
-
     return myScene;
   }
 
@@ -148,6 +148,9 @@ public class Main extends Application {
   private void step(double elapsedTime, Group root, Scene scene) throws FileNotFoundException {
     //move the ball
     gameBall.move(elapsedTime);
+    if(powerUpActive){
+      justReleased.move(elapsedTime);
+    }
 
     myScene.setOnKeyPressed(new EventHandler<KeyEvent>() {
       @Override
@@ -246,7 +249,7 @@ public class Main extends Application {
     ballWallIntersection(gameBall.getCircle());
     //Check for brick collisions
     for (Brick brick : brickAccess) {
-      ballBrickIntersection(gameBall.getCircle(), brick, brickArray);
+      ballBrickIntersection(gameBall.getCircle(), brick, brickArray, root);
     }
 
   }
@@ -266,7 +269,13 @@ public class Main extends Application {
       row.setLayoutY((BRICK_HEIGHT + 1) * lineCount);
       row.setSpacing(1);
       for (String num : bricks) {
-        Brick cBrick = new Brick(BRICK_WIDTH, BRICK_HEIGHT, Integer.parseInt(num));
+        Brick cBrick;
+        if(new Random().nextInt(100 - 1 + 1) + 1 <= 10){
+          cBrick = new Brick(BRICK_WIDTH, BRICK_HEIGHT, Integer.parseInt(num),true);
+        }
+        else{
+          cBrick = new Brick(BRICK_WIDTH, BRICK_HEIGHT, Integer.parseInt(num), false);
+        }
         row.getChildren().add(cBrick.getRect());
         brickAccess.add(cBrick);
       }
@@ -298,12 +307,18 @@ public class Main extends Application {
     }
   }
 
-  private void ballBrickIntersection(Circle ball, Brick brick, Group bricks)
+  private void ballBrickIntersection(Circle ball, Brick brick, Group bricks, Group root)
       throws FileNotFoundException {
     Shape intersection = Shape.intersect(ball, brick.getRect());
     if (intersection.getBoundsInLocal().getWidth() != -1) {
       boolean isDead = brick.subLife();
       if (isDead) {
+        if(brick.holdsPowerUp){
+          root.getChildren().remove(justReleased);
+          powerUpActive = true;
+          justReleased = new PowerUp(new double[]{brick.getRect().getX(),brick.getRect().getY()});
+          root.getChildren().add(justReleased.getShape());
+        }
         brickAccess.remove(brick);
       }
       if (brickAccess.isEmpty()) {
