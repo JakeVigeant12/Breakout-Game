@@ -2,6 +2,8 @@ package breakout;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.*;
 import java.util.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -50,7 +52,9 @@ public class Main extends Application {
   private static Group brickArray;
   private static Text scoreText;
   private static Text livesText;
+  private static Text topScore;
 
+  private static ArrayList<Integer> highScores;
   private static ArrayList<Brick> brickAccess;
   //Game Element Colors
   public static final Paint BALL_COLOR = Color.YELLOWGREEN;
@@ -104,6 +108,7 @@ public class Main extends Application {
 
   // Create the game's "scene": what shapes will be in the game and their starting properties
   public Scene setupGame(int width, int height, Paint background) throws FileNotFoundException {
+    initializeScores();
     //Add ball to scene
     gameBall = new Ball(BALL_RADIUS, BALL_COLOR, new double[]{width / 2, height / 2});
     //Initialize Paddle
@@ -121,6 +126,18 @@ public class Main extends Application {
     // respond to mouse being moved
 
     return myScene;
+  }
+
+  private void initializeScores() throws FileNotFoundException {
+    String path = "src/main/resources/Scores/highScores.txt";
+    Scanner scanner = new Scanner(new File(path));
+    String scoreLine = scanner.nextLine();
+    String[] scores = scoreLine.split(" ");
+    highScores = new ArrayList<>();
+    for(String score : scores){
+      highScores.add(Integer.parseInt(score));
+    }
+
   }
 
   // Handle game "rules" for every "moment":
@@ -258,7 +275,7 @@ public class Main extends Application {
     }
   }
 
-  private void ballWallIntersection(Circle ball) {
+  private void ballWallIntersection(Circle ball) throws FileNotFoundException {
     if (ball.getCenterX() >= SIZE || ball.getCenterX() <= 0) {
       gameBall.reverse(0);
     }
@@ -291,6 +308,7 @@ public class Main extends Application {
 
   //Initializes score and lives text
   private void textInitialize(Group root) {
+    topScore = new Text("Top Score:" + highScores.get(9).toString());
     scoreText = new Text("Score:" + score.toString());
     livesText = new Text("Lives:" + lives.toString());
     scoreText.setFont(new Font("ARIAL", 30));
@@ -300,14 +318,19 @@ public class Main extends Application {
     scoreText.setFill(Color.WHITE);
     livesText.setFont(new Font("ARIAL", 30));
     livesText.setStyle("-fx-font-weight: bold;");
-    livesText.relocate(0, GRID_POS + 30);
+    livesText.relocate(0, GRID_POS + 55);
     livesText.setVisible(true);
     livesText.setFill(Color.WHITE);
-    root.getChildren().addAll(scoreText, livesText);
+    topScore.setFill(Color.WHITE);
+    topScore.setFont(new Font("ARIAL", 30));
+    topScore.setStyle("-fx-font-weight: bold;");
+    topScore.relocate(0, GRID_POS + 25);
+    topScore.setVisible(true);
+    root.getChildren().addAll(scoreText, livesText, topScore);
   }
 
   //lose a life
-  private void loseLife() {
+  private void loseLife() throws FileNotFoundException {
     if (lives == 0) {
       endGame();
       return;
@@ -342,7 +365,23 @@ public class Main extends Application {
   }
 
   //End game
-  private void endGame() {
+  private void endGame() throws FileNotFoundException {
+    highScores.add(score);
+    Collections.sort(highScores);
+    //Remove the last score as it will not be included.\
+    highScores.remove(0);
+    try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+        new FileOutputStream("src/main/resources/Scores/highScores.txt"), "utf-8"))) {
+      String output = "";
+      for(Integer score : highScores){
+        output += score;
+        output += " ";
+      }
+      writer.write(output);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
     gameBall.stopBall();
     livesText.setText("Game Over");
   }
