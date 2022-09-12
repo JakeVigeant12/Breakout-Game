@@ -74,7 +74,7 @@ public class Main extends Application {
   public static Integer score = 0;
   public static Integer lives = 3;
   public static int currLevel = 1;
-  public static boolean powerUpActive= false;
+  public static boolean powerUpActive = false;
   public static PowerUp justReleased;
   //Game-global variables that change
   public static final int INITIAL_LIVES = 3;
@@ -148,7 +148,7 @@ public class Main extends Application {
   private void step(double elapsedTime, Group root, Scene scene) throws FileNotFoundException {
     //move the ball
     gameBall.move(elapsedTime);
-    if(powerUpActive){
+    if (powerUpActive) {
       justReleased.move(elapsedTime);
     }
 
@@ -247,6 +247,9 @@ public class Main extends Application {
     ballPaddleIntersection(gameBall.getCircle(), gamePaddle.getShape());
     //Check for wall collisions
     ballWallIntersection(gameBall.getCircle());
+    if (powerUpActive) {
+      paddlePowerUpIntersection(justReleased, gamePaddle.getShape());
+    }
     //Check for brick collisions
     for (Brick brick : brickAccess) {
       ballBrickIntersection(gameBall.getCircle(), brick, brickArray, root);
@@ -270,10 +273,9 @@ public class Main extends Application {
       row.setSpacing(1);
       for (String num : bricks) {
         Brick cBrick;
-        if(new Random().nextInt(100 - 1 + 1) + 1 <= 10){
-          cBrick = new Brick(BRICK_WIDTH, BRICK_HEIGHT, Integer.parseInt(num),true);
-        }
-        else{
+        if (new Random().nextInt(100 - 1 + 1) + 1 <= 100) {
+          cBrick = new Brick(BRICK_WIDTH, BRICK_HEIGHT, Integer.parseInt(num), true);
+        } else {
           cBrick = new Brick(BRICK_WIDTH, BRICK_HEIGHT, Integer.parseInt(num), false);
         }
         row.getChildren().add(cBrick.getRect());
@@ -282,6 +284,26 @@ public class Main extends Application {
       brickArray.getChildren().add(row);
     }
     root.getChildren().add(brickArray);
+  }
+
+  private void paddlePowerUpIntersection(PowerUp powerUp, Rectangle paddle)
+      throws FileNotFoundException {
+    Shape intersection = Shape.intersect(powerUp.getShape(), paddle);
+    if (intersection.getBoundsInLocal().getWidth() != -1) {
+      switch (powerUp.effect) {
+        case 1:
+          lengthenPaddle();
+          break;
+        case 2:
+          currLevel++;
+          clearLevel();
+          break;
+      }
+    }
+  }
+
+  private void lengthenPaddle() {
+    gamePaddle.getShape().setWidth(gamePaddle.getShape().getWidth() * 1.05);
   }
 
   private void ballPaddleIntersection(Circle ball, Rectangle paddle) {
@@ -313,10 +335,10 @@ public class Main extends Application {
     if (intersection.getBoundsInLocal().getWidth() != -1) {
       boolean isDead = brick.subLife();
       if (isDead) {
-        if(brick.holdsPowerUp){
+        if (brick.holdsPowerUp) {
           root.getChildren().remove(justReleased);
           powerUpActive = true;
-          justReleased = new PowerUp(new double[]{brick.getRect().getX(),brick.getRect().getY()});
+          justReleased = new PowerUp(new double[]{brick.getRect().getX(), brick.getRect().getY()});
           root.getChildren().add(justReleased.getShape());
         }
         brickAccess.remove(brick);

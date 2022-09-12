@@ -5,7 +5,8 @@ import javafx.scene.shape.Shape;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 public class PowerUp {
-  private int effect;
+
+  public int effect;
   private Rectangle powerUp;
   private double[] velocity;
   private double[] position;
