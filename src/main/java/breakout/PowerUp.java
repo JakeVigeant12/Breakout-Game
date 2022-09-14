@@ -18,7 +18,7 @@ public class PowerUp {
     powerUp = new Rectangle(coordinates[0],coordinates[1],20,20);
     powerUp.setFill(Color.AZURE);
   }
-  public Shape getShape(){
+  public Rectangle getShape(){
     return this.powerUp;
   }
   public void move(double time) {

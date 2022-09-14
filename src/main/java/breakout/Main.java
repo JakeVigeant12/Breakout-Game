@@ -42,6 +42,7 @@ public class Main extends Application {
   public static final int SIZE = 400;
   public static final int FRAMES_PER_SECOND = 70;
   public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
+  private static final int PERCENT_OF_BRICKS_WITH_POWERUP = 10;
 
 
   private static Paddle gamePaddle;
@@ -58,6 +59,7 @@ public class Main extends Application {
   private static ArrayList<Integer> highScores;
   private static ArrayList<Brick> brickAccess;
   private static ArrayList<PowerUp> activePowerUps;
+  private static ArrayList<Ball> activeBalls;
   //Game Element Colors
   public static final Paint BALL_COLOR = Color.YELLOWGREEN;
   public static final Paint PADDLE_COLOR = Color.CADETBLUE;
@@ -110,8 +112,10 @@ public class Main extends Application {
   // Create the game's "scene": what shapes will be in the game and their starting properties
   public Scene setupGame(int width, int height, Paint background) throws FileNotFoundException {
     initializeScores();
+    activeBalls = new ArrayList<>();
     //Add ball to scene
     gameBall = new Ball(BALL_RADIUS, BALL_COLOR, new double[]{width / 2, height / 2});
+    activeBalls.add(gameBall);
     //Initialize Paddle
     gamePaddle = new Paddle(new double[]{SIZE / 2 - PADDLE_HEIGHT / 2, SIZE - PADDLE_HEIGHT},
         PADDLE_WIDTH,
@@ -147,7 +151,9 @@ public class Main extends Application {
   // Note, there are more sophisticated ways to animate shapes, but these simple ways work fine to start
   private void step(double elapsedTime, Group root, Scene scene) throws FileNotFoundException {
     //move the ball
-    gameBall.move(elapsedTime);
+    for(Ball currBall : activeBalls){
+      currBall.move(elapsedTime);
+    }
     if (!activePowerUps.isEmpty()) {
       for(PowerUp currentPowerUp : activePowerUps) {
         currentPowerUp.move(elapsedTime);
@@ -245,18 +251,21 @@ public class Main extends Application {
         }
       }
     });
-    // check for collision with paddle
-    ballPaddleIntersection(gameBall.getCircle(), gamePaddle.getShape());
-    //Check for wall collisions
-    ballWallIntersection(gameBall.getCircle());
+    // check for collision with paddle and wall on each ball
+    for(Ball currBall : activeBalls){
+      ballPaddleIntersection(currBall, gamePaddle.getShape());
+      ballWallIntersection(currBall, root);
+    }
     if (!activePowerUps.isEmpty()) {
       for(PowerUp currentPowerUp : activePowerUps) {
-        paddlePowerUpIntersection(currentPowerUp, gamePaddle.getShape());
+        paddlePowerUpIntersection(currentPowerUp, gamePaddle.getShape(), root);
       }
     }
     //Check for brick collisions
     for (Brick brick : brickAccess) {
-      ballBrickIntersection(gameBall.getCircle(), brick, brickArray, root);
+      for(Ball currBall : activeBalls) {
+        ballBrickIntersection(currBall, brick, brickArray, root);
+      }
     }
 
   }
@@ -277,7 +286,7 @@ public class Main extends Application {
       row.setSpacing(1);
       for (String num : bricks) {
         Brick cBrick;
-        if (new Random().nextInt(100 - 1 + 1) + 1 <= 100) {
+        if (new Random().nextInt(100 - 1 + 1) + 1 <= PERCENT_OF_BRICKS_WITH_POWERUP) {
           cBrick = new Brick(BRICK_WIDTH, BRICK_HEIGHT, Integer.parseInt(num), true);
         } else {
           cBrick = new Brick(BRICK_WIDTH, BRICK_HEIGHT, Integer.parseInt(num), false);
@@ -290,7 +299,7 @@ public class Main extends Application {
     root.getChildren().add(brickArray);
   }
 
-  private void paddlePowerUpIntersection(PowerUp powerUp, Rectangle paddle)
+  private void paddlePowerUpIntersection(PowerUp powerUp, Rectangle paddle, Group root)
       throws FileNotFoundException {
     Shape intersection = Shape.intersect(powerUp.getShape(), paddle);
     if (intersection.getBoundsInLocal().getWidth() != -1) {
@@ -302,40 +311,57 @@ public class Main extends Application {
           currLevel++;
           clearLevel();
           break;
+        case 3:
+          addBall(root);
+          break;
       }
+      root.getChildren().remove(powerUp.getShape());
+      activePowerUps.remove(powerUp);
     }
+  }
+
+  private void addBall(Group root) {
+    Ball spawnedBall = new Ball(BALL_RADIUS,BALL_COLOR,new double[]{SIZE/2,SIZE/2});
+    activeBalls.add(spawnedBall);
+    root.getChildren().add(spawnedBall.getCircle());
   }
 
   private void lengthenPaddle() {
+    double currentPaddleWidth = gamePaddle.getShape().getWidth();
+  if(currentPaddleWidth > PADDLE_WIDTH){
+    gamePaddle.getShape().setWidth(gamePaddle.getShape().getWidth() * 0.95);
+    return;
+  }
     gamePaddle.getShape().setWidth(gamePaddle.getShape().getWidth() * 1.05);
   }
 
-  private void ballPaddleIntersection(Circle ball, Rectangle paddle) {
-    Shape intersection = Shape.intersect(ball, paddle);
+  private void ballPaddleIntersection(Ball ball, Rectangle paddle) {
+    Shape intersection = Shape.intersect(ball.getCircle(), paddle);
     if (intersection.getBoundsInLocal().getWidth() != -1) {
-      gameBall.reverse(1);
+      ball.reverse(1);
       //Depending on position ball hits paddle, set velocity
       //left side of paddle, always redirects to the left
-      gameBall.paddleCollison(ball.getCenterX() >= (paddle.getX() + PADDLE_WIDTH / 2));
+      ball.paddleCollison(ball.getCircle().getCenterX() >= (paddle.getX() + PADDLE_WIDTH / 2));
     }
   }
 
-  private void ballWallIntersection(Circle ball) throws FileNotFoundException {
-    if (ball.getCenterX() >= SIZE || ball.getCenterX() <= 0) {
-      gameBall.reverse(0);
+  private void ballWallIntersection(Ball ball, Group root) throws FileNotFoundException {
+    if (ball.getCircle().getCenterX() >= SIZE || ball.getCircle().getCenterX() <= 0) {
+      ball.reverse(0);
     }
-    if (ball.getCenterY() <= 0) {
-      gameBall.reverse(1);
+    if (ball.getCircle().getCenterY() <= 0) {
+      ball.reverse(1);
     }
-    if (ball.getCenterY() >= SIZE) {
-      gameBall.reset(new double[]{SIZE / 2, SIZE / 2});
-      loseLife();
+    if (ball.getCircle().getCenterY() >= SIZE) {
+      root.getChildren().remove(ball.getCircle());
+      activeBalls.remove(ball);
+      loseLife(root);
     }
   }
 
-  private void ballBrickIntersection(Circle ball, Brick brick, Group bricks, Group root)
+  private void ballBrickIntersection(Ball ball, Brick brick, Group bricks, Group root)
       throws FileNotFoundException {
-    Shape intersection = Shape.intersect(ball, brick.getRect());
+    Shape intersection = Shape.intersect(ball.getCircle(), brick.getRect());
     if (intersection.getBoundsInLocal().getWidth() != -1) {
       boolean isDead = brick.subLife();
       if (isDead) {
@@ -350,7 +376,7 @@ public class Main extends Application {
         currLevel++;
         clearLevel();
       }
-      gameBall.reverse(1);
+      ball.reverse(1);
       updateScore();
     }
 
@@ -386,13 +412,18 @@ public class Main extends Application {
   }
 
   //lose a life
-  private void loseLife() throws FileNotFoundException {
+  private void loseLife(Group root) throws FileNotFoundException {
     if (lives == 0) {
       endGame();
       return;
     }
-    lives--;
-    livesText.setText("Lives:" + (lives.toString()));
+    if(activeBalls.isEmpty()) {
+      lives--;
+      livesText.setText("Lives:" + (lives.toString()));
+      Ball replacement = new Ball(BALL_RADIUS, BALL_COLOR,new double[]{SIZE/2, SIZE/2});
+      activeBalls.add(replacement);
+      root.getChildren().add(replacement.getCircle());
+    }
   }
 
   private void addLife() {
