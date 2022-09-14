@@ -57,6 +57,7 @@ public class Main extends Application {
 
   private static ArrayList<Integer> highScores;
   private static ArrayList<Brick> brickAccess;
+  private static ArrayList<PowerUp> activePowerUps;
   //Game Element Colors
   public static final Paint BALL_COLOR = Color.YELLOWGREEN;
   public static final Paint PADDLE_COLOR = Color.CADETBLUE;
@@ -74,8 +75,6 @@ public class Main extends Application {
   public static Integer score = 0;
   public static Integer lives = 3;
   public static int currLevel = 1;
-  public static boolean powerUpActive = false;
-  public static PowerUp justReleased;
   //Game-global variables that change
   public static final int INITIAL_LIVES = 3;
   public static int INITIAL_SCORE = 0;
@@ -90,6 +89,7 @@ public class Main extends Application {
   public void start(Stage stage) throws FileNotFoundException {
     // attach scene to the stage and display it
     myScene = setupGame(SIZE, SIZE, BACKGROUND);
+    activePowerUps = new ArrayList<>();
     stage.setScene(myScene);
     stage.setTitle(TITLE);
     stage.show();
@@ -148,8 +148,10 @@ public class Main extends Application {
   private void step(double elapsedTime, Group root, Scene scene) throws FileNotFoundException {
     //move the ball
     gameBall.move(elapsedTime);
-    if (powerUpActive) {
-      justReleased.move(elapsedTime);
+    if (!activePowerUps.isEmpty()) {
+      for(PowerUp currentPowerUp : activePowerUps) {
+        currentPowerUp.move(elapsedTime);
+      }
     }
 
     myScene.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -247,8 +249,10 @@ public class Main extends Application {
     ballPaddleIntersection(gameBall.getCircle(), gamePaddle.getShape());
     //Check for wall collisions
     ballWallIntersection(gameBall.getCircle());
-    if (powerUpActive) {
-      paddlePowerUpIntersection(justReleased, gamePaddle.getShape());
+    if (!activePowerUps.isEmpty()) {
+      for(PowerUp currentPowerUp : activePowerUps) {
+        paddlePowerUpIntersection(currentPowerUp, gamePaddle.getShape());
+      }
     }
     //Check for brick collisions
     for (Brick brick : brickAccess) {
@@ -299,7 +303,6 @@ public class Main extends Application {
           clearLevel();
           break;
       }
-      powerUpActive = false;
     }
   }
 
@@ -337,10 +340,9 @@ public class Main extends Application {
       boolean isDead = brick.subLife();
       if (isDead) {
         if (brick.holdsPowerUp) {
-          root.getChildren().remove(justReleased);
-          powerUpActive = true;
-          justReleased = new PowerUp(new double[]{brick.getRect().getX(), brick.getRect().getY()});
-          root.getChildren().add(justReleased.getShape());
+          PowerUp currentPowerUp = new PowerUp(new double[]{brick.getRect().getX(), brick.getRect().getY()});
+          root.getChildren().add(currentPowerUp.getShape());
+          activePowerUps.add(currentPowerUp);
         }
         brickAccess.remove(brick);
       }
