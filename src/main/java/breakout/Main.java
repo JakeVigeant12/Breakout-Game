@@ -42,8 +42,7 @@ public class Main extends Application {
   public static final int SIZE = 400;
   public static final int FRAMES_PER_SECOND = 70;
   public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
-  private static final int PERCENT_OF_BRICKS_WITH_POWERUP = 10;
-
+  private static final int PERCENT_OF_BRICKS_WITH_POWERUP = 100;
 
   private static Paddle gamePaddle;
 
@@ -306,8 +305,8 @@ public class Main extends Application {
           lengthenPaddle();
           break;
         case 2:
-          currLevel++;
-          clearLevel();
+          //currLevel++;
+          //clearLevel();
           break;
         case 3:
           addBall(root);
@@ -432,7 +431,7 @@ public class Main extends Application {
   private void reset() {
     for (Ball currBall : activeBalls) {
       currBall.reset(new double[]{SIZE / 2, SIZE / 2});
-      currBall.reset(new double[]{SIZE / 2 - PADDLE_HEIGHT / 2, SIZE - PADDLE_HEIGHT});
+      gamePaddle.reset(new double[]{SIZE / 2 - PADDLE_HEIGHT / 2, SIZE - PADDLE_HEIGHT});
     }
   }
   private void updateScore() {
@@ -477,8 +476,8 @@ public class Main extends Application {
 
     for (Ball currBall : activeBalls) {
       currBall.stopBall();
-      livesText.setText("Game Over");
     }
+    livesText.setText("Game Over");
   }
 
   /**
