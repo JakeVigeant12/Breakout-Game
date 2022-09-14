@@ -47,8 +47,6 @@ public class Main extends Application {
 
   private static Paddle gamePaddle;
 
-  private Ball gameBall;
-
   private static Group root;
   private static Group brickArray;
   private static Text scoreText;
@@ -114,8 +112,8 @@ public class Main extends Application {
     initializeScores();
     activeBalls = new ArrayList<>();
     //Add ball to scene
-    gameBall = new Ball(BALL_RADIUS, BALL_COLOR, new double[]{width / 2, height / 2});
-    activeBalls.add(gameBall);
+    Ball firstBall = new Ball(BALL_RADIUS, BALL_COLOR, new double[]{width / 2, height / 2});
+    activeBalls.add(firstBall);
     //Initialize Paddle
     gamePaddle = new Paddle(new double[]{SIZE / 2 - PADDLE_HEIGHT / 2, SIZE - PADDLE_HEIGHT},
         PADDLE_WIDTH,
@@ -127,7 +125,7 @@ public class Main extends Application {
     brickAccess = new ArrayList<>();
     brickArray = new Group();
     setBricks(root, currLevel);
-    root.getChildren().add(gameBall.getCircle());
+    root.getChildren().add(firstBall.getCircle());
     myScene = new Scene(root, width, height, background);
     return myScene;
   }
@@ -432,10 +430,11 @@ public class Main extends Application {
   }
 
   private void reset() {
-    gameBall.reset(new double[]{SIZE / 2, SIZE / 2});
-    gamePaddle.reset(new double[]{SIZE / 2 - PADDLE_HEIGHT / 2, SIZE - PADDLE_HEIGHT});
+    for (Ball currBall : activeBalls) {
+      currBall.reset(new double[]{SIZE / 2, SIZE / 2});
+      currBall.reset(new double[]{SIZE / 2 - PADDLE_HEIGHT / 2, SIZE - PADDLE_HEIGHT});
+    }
   }
-
   private void updateScore() {
     score += BlOCK_SCORE;
     scoreText.setText("Score:" + score);
@@ -444,12 +443,16 @@ public class Main extends Application {
   private void clearLevel() throws FileNotFoundException {
     if (currLevel == 4) {
       livesText.setText("You Win!");
-      gameBall.stopBall();
+      for(Ball currBall : activeBalls){
+        currBall.stopBall();
+      }
       return;
     }
     levelText.setText("Level: " + currLevel);
     brickAccess = new ArrayList<>();
-    gameBall.reset(new double[]{SIZE / 2, SIZE / 2});
+    for(Ball currBall : activeBalls){
+      currBall.reset(new double[]{SIZE / 2, SIZE / 2});
+    }
     setBricks(root, currLevel);
 
   }
@@ -472,8 +475,10 @@ public class Main extends Application {
       throw new RuntimeException(e);
     }
 
-    gameBall.stopBall();
-    livesText.setText("Game Over");
+    for (Ball currBall : activeBalls) {
+      currBall.stopBall();
+      livesText.setText("Game Over");
+    }
   }
 
   /**
