@@ -46,7 +46,7 @@ public class Main extends Application {
 
   private  Paddle gamePaddle;
 
-  private Group root;
+  public Group root;
   private Group brickArray;
   private Text scoreText;
   private Text livesText;
@@ -56,7 +56,7 @@ public class Main extends Application {
   private ArrayList<Integer> highScores;
   private ArrayList<Brick> brickAccess;
   private ArrayList<PowerUp> activePowerUps;
-  private ArrayList<Ball> activeBalls;
+  public ArrayList<Ball> activeBalls;
   //Game Element Colors
   private final Paint BALL_COLOR = Color.YELLOWGREEN;
   private final Paint PADDLE_COLOR = Color.CADETBLUE;
@@ -106,6 +106,7 @@ public class Main extends Application {
   public Scene setupGame(int width, int height, Paint background) throws FileNotFoundException {
     initializeScores();
     activeBalls = new ArrayList<>();
+
     //Add ball to scene
     Ball firstBall = new Ball(BALL_RADIUS, BALL_COLOR, new double[]{width / 2, height / 2});
     activeBalls.add(firstBall);
@@ -296,29 +297,11 @@ public class Main extends Application {
       throws FileNotFoundException {
     Shape intersection = Shape.intersect(powerUp.getShape(), paddle);
     if (intersection.getBoundsInLocal().getWidth() != -1) {
-      switch (powerUp.effect) {
-        case 1:
-          lengthenPaddle();
-          break;
-        case 2:
-          //currLevel++;
-          //clearLevel();
-          break;
-        case 3:
-          addBall(root);
-          break;
-      }
+      powerUp.affectGame(root);
       root.getChildren().remove(powerUp.getShape());
       activePowerUps.remove(powerUp);
     }
   }
-
-  private void addBall(Group root) {
-    Ball spawnedBall = new Ball(BALL_RADIUS,BALL_COLOR,new double[]{SIZE/2,SIZE/2});
-    activeBalls.add(spawnedBall);
-    root.getChildren().add(spawnedBall.getCircle());
-  }
-
   private void lengthenPaddle() {
     double currentPaddleWidth = gamePaddle.getShape().getWidth();
   if(currentPaddleWidth > PADDLE_WIDTH){
@@ -359,7 +342,14 @@ public class Main extends Application {
       boolean isDead = brick.subLife();
       if (isDead) {
         if (brick.holdsPowerUp) {
-          PowerUp currentPowerUp = new PowerUp(new double[]{brick.getRect().getX(), brick.getRect().getY()});
+          //Use a random number to determine which of the 3 powerups to add
+          int powerUpType = new Random().nextInt(3 - 1 + 1) + 1;
+          switch(powerUpType) {
+            case 1:
+            PowerUp currentPowerUp = new BallPowerUp(
+                new double[]{brick.getRect().getX(), brick.getRect().getY()});
+            break;
+          }
           root.getChildren().add(currentPowerUp.getShape());
           activePowerUps.add(currentPowerUp);
         }

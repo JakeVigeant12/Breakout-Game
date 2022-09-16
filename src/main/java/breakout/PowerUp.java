@@ -1,10 +1,12 @@
 package breakout;
 import java.util.Random;
+import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-public class PowerUp {
+public abstract class PowerUp {
 
   public int effect;
   private Rectangle powerUp;
@@ -12,7 +14,7 @@ public class PowerUp {
   private double[] position;
   public PowerUp(double[] coordinates){
     //Get a random number 1-3
-    effect = new Random().nextInt(3 - 1 + 1) + 1;
+
     velocity = new double[]{100,400};
     position = coordinates;
     powerUp = new Rectangle(coordinates[0],coordinates[1],20,20);
@@ -27,5 +29,5 @@ public class PowerUp {
     powerUp.setX(position[0]);
     powerUp.setY(position[1]);
   }
-
+  public abstract Node affectGame(Group root);
 }
