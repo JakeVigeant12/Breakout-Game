@@ -38,45 +38,41 @@ import javafx.scene.layout.Pane;
 public class Main extends Application {
 
   // useful names for constant values used
-  public static final String TITLE = "BreakOut Game";
-  public static final int SIZE = 400;
-  public static final int FRAMES_PER_SECOND = 70;
-  public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
-  private static final int PERCENT_OF_BRICKS_WITH_POWERUP = 100;
+  private final String TITLE = "BreakOut Game";
+  private final int SIZE = 400;
+  private final int FRAMES_PER_SECOND = 70;
+  private final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
+  private final int PERCENT_OF_BRICKS_WITH_POWERUP = 100;
 
-  private static Paddle gamePaddle;
+  private  Paddle gamePaddle;
 
-  private static Group root;
-  private static Group brickArray;
-  private static Text scoreText;
-  private static Text livesText;
-  private static Text topScore;
-  private static Text levelText;
+  private Group root;
+  private Group brickArray;
+  private Text scoreText;
+  private Text livesText;
+  private Text topScore;
+  private Text levelText;
 
-  private static ArrayList<Integer> highScores;
-  private static ArrayList<Brick> brickAccess;
-  private static ArrayList<PowerUp> activePowerUps;
-  private static ArrayList<Ball> activeBalls;
+  private ArrayList<Integer> highScores;
+  private ArrayList<Brick> brickAccess;
+  private ArrayList<PowerUp> activePowerUps;
+  private ArrayList<Ball> activeBalls;
   //Game Element Colors
-  public static final Paint BALL_COLOR = Color.YELLOWGREEN;
-  public static final Paint PADDLE_COLOR = Color.CADETBLUE;
-  public static final Paint BACKGROUND = Color.BLACK;
+  private final Paint BALL_COLOR = Color.YELLOWGREEN;
+  private final Paint PADDLE_COLOR = Color.CADETBLUE;
+  private final Paint BACKGROUND = Color.BLACK;
   //Game-wide constants
-  public static final double BALL_RADIUS = 10;
-  public static final int PADDLE_WIDTH = 150;
-  public static final int BRICK_WIDTH = 50;
-  public static final int BRICK_HEIGHT = 20;
-  public static final int PADDLE_HEIGHT = 20;
-  public static final int GRID_POS = 100;
-  public static final int BRICK_ROWS = 5;
-  private static final double PADDLE_VELOCITY = 3000;
-  public static final int BlOCK_SCORE = 100;
-  public static Integer score = 0;
-  public static Integer lives = 3;
-  public static int currLevel = 1;
-  //Game-global variables that change
-  public static final int INITIAL_LIVES = 3;
-  public static int INITIAL_SCORE = 0;
+  private final double BALL_RADIUS = 10;
+  private final int PADDLE_WIDTH = 150;
+  private final int BRICK_WIDTH = 50;
+  private final int BRICK_HEIGHT = 20;
+  private final int PADDLE_HEIGHT = 20;
+  private final int GRID_POS = 100;
+  private final double PADDLE_VELOCITY = 3000;
+  private final int BlOCK_SCORE = 100;
+  private Integer score = 0;
+  private Integer lives = 3;
+  private int currLevel = 1;
   // things needed to remember during the game
   private Scene myScene;
 
