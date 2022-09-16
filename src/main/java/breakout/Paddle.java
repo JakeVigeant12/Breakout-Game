@@ -5,9 +5,9 @@ public class Paddle {
   private double[] position;
   private double velocity;
   private Rectangle paddle;
-  public Paddle(double[] startingCoords, double width, double height, double velo, Paint color){
+  public Paddle(double[] startingCoords, double width, double height, double velocity, Paint color){
     position = startingCoords;
-    velocity = velo;
+    this.velocity = velocity;
     paddle = new Rectangle(position[0],position[1], width,  height);
     paddle.setFill(color);
   }
