@@ -1,12 +1,10 @@
 package breakout;
-import java.util.Random;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-public abstract class PowerUp {
+
+public abstract class PowerUp <T>{
 
   public int effect;
   private Rectangle powerUp;
@@ -29,5 +27,5 @@ public abstract class PowerUp {
     powerUp.setX(position[0]);
     powerUp.setY(position[1]);
   }
-  public abstract Node affectGame(Group root);
+  public abstract Object affectGame();
 }

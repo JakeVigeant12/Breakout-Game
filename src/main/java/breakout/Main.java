@@ -10,24 +10,17 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.scene.layout.Pane;
 
 /**
  * Some game-initialization materials taken from A basic first example JavaFX program (Robert
@@ -56,7 +49,7 @@ public class Main extends Application {
   private ArrayList<Integer> highScores;
   private ArrayList<Brick> brickAccess;
   private ArrayList<PowerUp> activePowerUps;
-  public ArrayList<Ball> activeBalls;
+  public static ArrayList<Ball> activeBalls;
   //Game Element Colors
   private final Paint BALL_COLOR = Color.YELLOWGREEN;
   private final Paint PADDLE_COLOR = Color.CADETBLUE;
@@ -297,9 +290,11 @@ public class Main extends Application {
       throws FileNotFoundException {
     Shape intersection = Shape.intersect(powerUp.getShape(), paddle);
     if (intersection.getBoundsInLocal().getWidth() != -1) {
-      powerUp.affectGame(root);
       root.getChildren().remove(powerUp.getShape());
       activePowerUps.remove(powerUp);
+      Ball result = (Ball) powerUp.affectGame();
+      activeBalls.add(result);
+      root.getChildren().add(result.getCircle());
     }
   }
   private void lengthenPaddle() {
@@ -344,14 +339,15 @@ public class Main extends Application {
         if (brick.holdsPowerUp) {
           //Use a random number to determine which of the 3 powerups to add
           int powerUpType = new Random().nextInt(3 - 1 + 1) + 1;
+          PowerUp currentPowerUp;
           switch(powerUpType) {
             case 1:
-            PowerUp currentPowerUp = new BallPowerUp(
+             currentPowerUp = new BallPowerUp(
                 new double[]{brick.getRect().getX(), brick.getRect().getY()});
+               activePowerUps.add(currentPowerUp);
+               root.getChildren().add(currentPowerUp.getShape());
             break;
           }
-          root.getChildren().add(currentPowerUp.getShape());
-          activePowerUps.add(currentPowerUp);
         }
         brickAccess.remove(brick);
       }
