@@ -35,9 +35,9 @@ public class Main extends Application {
   private final int SIZE = 400;
   private final int FRAMES_PER_SECOND = 70;
   private final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
-  private final int PERCENT_OF_BRICKS_WITH_POWERUP = 100;
+  private final int PERCENT_OF_BRICKS_WITH_POWERUP = 500;
 
-  private  Paddle gamePaddle;
+  private static Paddle gamePaddle;
 
   public Group root;
   private Group brickArray;
@@ -48,7 +48,7 @@ public class Main extends Application {
 
   private ArrayList<Integer> highScores;
   private ArrayList<Brick> brickAccess;
-  private ArrayList<PowerUp> activePowerUps;
+  public ArrayList<PowerUp> activePowerUps;
   public static ArrayList<Ball> activeBalls;
   //Game Element Colors
   private final Paint BALL_COLOR = Color.YELLOWGREEN;
@@ -56,7 +56,7 @@ public class Main extends Application {
   private final Paint BACKGROUND = Color.BLACK;
   //Game-wide constants
   private final double BALL_RADIUS = 10;
-  private final int PADDLE_WIDTH = 150;
+  private static final int PADDLE_WIDTH = 150;
   private final int BRICK_WIDTH = 50;
   private final int BRICK_HEIGHT = 20;
   private final int PADDLE_HEIGHT = 20;
@@ -292,18 +292,34 @@ public class Main extends Application {
     if (intersection.getBoundsInLocal().getWidth() != -1) {
       root.getChildren().remove(powerUp.getShape());
       activePowerUps.remove(powerUp);
-      Ball result = (Ball) powerUp.affectGame();
-      activeBalls.add(result);
-      root.getChildren().add(result.getCircle());
+      int powerUpType = new Random().nextInt(3 - 1 + 1) + 1;
+      switch(powerUpType){
+        case 1:
+        Ball newestBall  = (Ball) powerUp.affectGame();
+          activeBalls.add(newestBall);
+          root.getChildren().add(newestBall.getCircle());
+          break;
+        case 2:
+          lengthenPaddle();
+          break;
+        case 3:
+          for(Ball curr : activeBalls){
+            //Multiply each ball velocity by this value
+            curr.setVelocity(1.5);
+            break;
+          }
+      }
+
     }
   }
-  private void lengthenPaddle() {
+  public static Paddle lengthenPaddle() {
     double currentPaddleWidth = gamePaddle.getShape().getWidth();
   if(currentPaddleWidth > PADDLE_WIDTH){
     gamePaddle.getShape().setWidth(gamePaddle.getShape().getWidth() * 0.95);
-    return;
+    return gamePaddle;
   }
-    gamePaddle.getShape().setWidth(gamePaddle.getShape().getWidth() * 1.05);
+    gamePaddle.getShape().setWidth(gamePaddle.getShape().getWidth() * 1.25);
+  return gamePaddle;
   }
 
   private void ballPaddleIntersection(Ball ball, Rectangle paddle) {

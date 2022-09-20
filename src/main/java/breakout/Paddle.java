@@ -1,7 +1,8 @@
 package breakout;
+import javafx.scene.Node;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Paint;
-public class Paddle {
+public class Paddle extends Node {
   private double[] position;
   private double velocity;
   private Rectangle paddle;

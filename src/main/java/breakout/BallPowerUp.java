@@ -4,6 +4,7 @@ import javafx.scene.Group;
 import javafx.scene.paint.Color;
 
 public class BallPowerUp extends PowerUp{
+  public int type = 1;
 
   public BallPowerUp(double[] coordinates) {
     super(coordinates);

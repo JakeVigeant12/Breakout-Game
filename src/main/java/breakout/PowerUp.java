@@ -10,9 +10,10 @@ public abstract class PowerUp <T>{
   private Rectangle powerUp;
   private double[] velocity;
   private double[] position;
+  public int type;
+
   public PowerUp(double[] coordinates){
     //Get a random number 1-3
-
     velocity = new double[]{100,400};
     position = coordinates;
     powerUp = new Rectangle(coordinates[0],coordinates[1],20,20);
@@ -27,5 +28,6 @@ public abstract class PowerUp <T>{
     powerUp.setX(position[0]);
     powerUp.setY(position[1]);
   }
-  public abstract Object affectGame();
+  public abstract Node affectGame();
+
 }

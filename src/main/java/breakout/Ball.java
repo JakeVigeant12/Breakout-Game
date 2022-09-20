@@ -1,9 +1,10 @@
 package breakout;
 
+import javafx.scene.Node;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 
-public class Ball {
+public class Ball extends Node {
 
   private Circle ball;
   //vectors stored as arrays, 0 = x, 1 = y
@@ -50,5 +51,8 @@ public class Ball {
     }
     velocity[0] = -1 * Math.abs(velocity[0]);
   }
-
+  public void setVelocity(double multiple) {
+    velocity[0] *= multiple;
+    velocity[1] *= multiple;
+  }
 }
