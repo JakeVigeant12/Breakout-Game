@@ -6,6 +6,7 @@ stages:
 sonar_analysis:
   stage: analyze
   script:
+    - |
       mvn -B -ntp sonar:sonar \
         -Dsonar.host.url=http://coursework.cs.duke.edu:9000 \
         -Dsonar.sources=src \
